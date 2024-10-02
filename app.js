@@ -32,5 +32,6 @@ app.use((err, _req, res, _next) => {
 
 // export the express application
 export { app };
+console.log("first");
 
 
