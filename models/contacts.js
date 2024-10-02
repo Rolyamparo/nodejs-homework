@@ -4,10 +4,6 @@ import { nanoid } from "nanoid";
 
 const contactsPath = path.join("models", "contacts.json");
 
-
-
-// const fs = require('fs/promises')
-
 const listContacts = async () => {
   const contacts = await fs.readFile(contactsPath);
   return JSON.parse(contacts);
