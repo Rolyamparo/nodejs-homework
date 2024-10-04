@@ -1,93 +1,123 @@
 import { Contact } from "../models/contactsModel.js";
-// prettier-ignore
-import { contactValidation, favoriteValidation } from "../validations/validation.js";
-import { httpError } from "../helpers/httpError.js";
+import { contactValidation, favoriteValidation } from "../validation/validation.js";
 
-const getAllContacts = async (req, res) => {
-  const { page = 1, limit = 20, favorite } = req.query;
-  const query = favorite ? { favorite: true } : {};
 
-  const result = await Contact.find(query)
-    .skip((page - 1) * limit)
-    .limit(parseInt(limit));
-
-  res.json(result);
+const getAllContacts = async (_req, res, next) => {
+try {
+    // const result = await listContacts();
+    const result = await Contact.find();
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
 };
 
-const getContactById = async (req, res) => {
-  const { contactId } = req.params;
-  const result = await Contact.findById(contactId);
+const getContactById = async (req, res, next) => {
+try {
+    const { contactId } = req.params;
+    const result = Contact.findOne(contactId);
+    
+    if (!result) {
+      res.status(404).json({ message: "Not found" });
+    }
 
-  if (!result) {
-    throw httpError(404, "Contact ID Not Found");
+    res.status(200).json(result);
+  } catch (error) {
+    next(error); // default middleware handler ni express
+  }
+};
+
+const addContact = async (req, res, next) => {
+
+// eslint-disable-next-line no-undef
+const { error } = contactValidation.validate(req.body);
+
+if (error) {
+    res.status(400).json({ message: "missing required name field" });
+    }
+    
+try {
+const result = await Contact.create(req.body);
+    // const result = await addContact(req.body);
+    res.status(201).json(result);
+} catch (error) {
+    next(error);
+}
+};
+
+const deleteContact = async (req, res, next) => {
+try {
+    const { contactId } = req.params;
+    // const result = await removeContact(contactId);
+    const result = await Contact.findByIdAndDelete(contactId);
+    // const result = await Contact.findOneAndRemove(contactId);
+
+    if (!result) {
+      res.status(404).json({ message: "Not found" });
+        }
+       res.status(200).json(result);
+  } catch (error) {
+    next(error); 
   }
 
-  res.json(result);
+  // return result;
 };
 
-const addContact = async (req, res) => {
-  // Preventing lack of necessary data for contacts (check validations folder)
-  const { error } = contactValidation.validate(req.body);
+const updateContact = async (req, res, next) => {
+// eslint-disable-next-line no-undef
+const { error } = contactValidation.validate(req.body);
 
   if (error) {
-    throw httpError(400, "missing required fields");
+    res.status(400).json({ message: "missing required name field" });
   }
 
-  const result = await Contact.create(req.body);
+  try {
+    // const result = await updateContact(req.params.contactId, req.body);
+    const result = await Contact.findByIdAndUpdate(
+      req.params.contactId,
+      req.body
+    );
 
-  res.status(201).json(result);
-};
+    if (!result) {
+      res.status(404).json({ message: "Not found" });
+    }
 
-const deleteContactById = async (req, res) => {
-  const { contactId } = req.params;
-  const result = await Contact.findByIdAndDelete(contactId);
-
-  if (!result) {
-    throw httpError(404);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
   }
-
-  res.json({
-    message: "Contact deleted",
-  });
-};
-
-const updateContactById = async (req, res) => {
-  // Preventing lack of necessary data for contacts (check validations folder)
-  const { error } = contactValidation.validate(req.body);
-  if (error) {
-    throw httpError(400, "missing fields");
-  }
-
-  const { contactId } = req.params;
-  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
-    new: true,
-  });
-
-  if (!result) {
-    throw httpError(404);
-  }
-
-  res.json(result);
 };
 
 const updateStatusContact = async (req, res) => {
-  // Preventing lack of necessary data for favorite (check validations folder)
+  // Validate the favorite field
   const { error } = favoriteValidation.validate(req.body);
   if (error) {
-    throw httpError(400, "missing field favorite");
+    return res.status(400).json({ message: "missing field favorite" });
   }
+  try {
+    const { contactId } = req.params;
 
-  const { contactId } = req.params;
-  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
-    new: true,
-  });
+    const result = await contactId.findByIdAndUpdate(contactId, req.body, {
+      favorite: true,
+    });
 
-  if (!result) {
-    throw httpError(404);
+    if (!result) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+    res.json(result);
+    
+  } catch (error) {
+    // Handle any other errors
+    res.status(500).json({ message: error.message });
   }
-
-  res.json(result);
 };
 
-// prettier-ignore
-export { getAllContacts, getContactById, addContact, deleteContactById, updateContactById, updateStatusContact};
+
+export {
+  getAllContacts,
+  getContactById,
+  addContact,
+  deleteContact,
+  updateContact,
+  updateStatusContact
+};

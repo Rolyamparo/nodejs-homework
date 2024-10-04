@@ -1,44 +1,32 @@
 import express from "express";
-import { ctrlWrapper } from "../../helpers/ctrlWrapper.js";
-// prettier-ignore
-import { addContact, deleteContactById, getAllContacts, getContactById, updateContactById, updateStatusContact } from "../../controllers/contactsController.js";
-import { authenticateToken } from "../../middlewares/authenticateToken.js";
+import {
+  getAllContacts,
+  getContactById,
+  addContact,
+  deleteContact,
+  updateContact,
+  updateStatusContact,
+} from "../../controllers/contactsController.js";
 
-const router = express.Router();
 
-/* GET: // http://localhost:3000/api/contacts */
-router.get("/", authenticateToken, ctrlWrapper(getAllContacts));
+const router = express.Router()
 
-/* GET: // http://localhost:3000/api/contacts/:contactId */
-router.get("/:contactId", authenticateToken, ctrlWrapper(getContactById));
+// corresponds to listContacts
+router.get("/", getAllContacts);
 
-/* POST: // http://localhost:3000/api/contacts/ 
-{
-    "name": "",
-    "email": "abc@example.com",
-    "phone": "(639) 840-6611"
-} 
-*/
-router.post("/", authenticateToken, ctrlWrapper(addContact));
+// corresponds to getContactById
+router.get("/:contactId", getContactById);
 
-/* DELETE: // http://localhost:3000/api/contacts/:contactId */
-router.delete("/:contactId", authenticateToken, ctrlWrapper(deleteContactById));
+// corresponds to addContact
+router.post("/", addContact);
 
-/* PUT: // http://localhost:3000/api/contacts/:contactId 
-{
-    "name": "Joanna Shaw",
-    "email": "joannashaw@example.com",
-    "phone": "(639) 777-8819"
-} 
-*/
-router.put("/:contactId", authenticateToken, ctrlWrapper(updateContactById));
+// corresponds to removeContact
+router.delete("/:contactId", deleteContact);
 
-/* PATCH: // http://localhost:3000/api/contacts/:contactId/favorite
-{
-    "favorite": true,
-}
-*/
-// prettier-ignore
-router.patch("/:contactId/favorite", authenticateToken, ctrlWrapper(updateStatusContact));
+// corresponds to updateContact
+router.put("/:contactId", updateContact);
+
+//update favorite field of contact
+//router.patch("/:contactId/favorite", authenticateToken, updateStatusContact);
 
 export { router };
