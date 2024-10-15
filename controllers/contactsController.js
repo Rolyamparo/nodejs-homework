@@ -1,4 +1,6 @@
-import { Contact } from "../models/contactsModel.js";
+import { Contact } from "../models/contacts.js";
+export const Contact = {""};
+
 
 // This is how the MVC Architecture looks like
 

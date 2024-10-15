@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { nanoid } from "nanoid";
 
+
 // THIS IS JUST MAKING USE OF THE FILE SYSTEM METHODS FROM NODEJS MODULE 01
 
 const contactsPath = path.join("models", "contacts.json");
