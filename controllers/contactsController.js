@@ -1,5 +1,5 @@
 import { Contact } from "../models/contacts.js";
-export const Contact = {""};
+// export const Contact = {""};
 
 
 // This is how the MVC Architecture looks like
